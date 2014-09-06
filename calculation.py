@@ -13,7 +13,7 @@ def _fit360(n):
 #
 
 def loc_of_planet(planet, start, end, freq='1D', scale=1, fit360=False):
-    """Calculate the locations of planet with in a time period.
+    """Calculate the locations of planet within a time span.
 
         parameters:
 
@@ -22,7 +22,7 @@ def loc_of_planet(planet, start, end, freq='1D', scale=1, fit360=False):
         freq: the calculation freq
         scale: mulitply the planet location 
 
-        return a pandas dataframe with planet location
+        return a pandas Series with planet location
 
     """
     
@@ -52,7 +52,7 @@ def loc_of_planet(planet, start, end, freq='1D', scale=1, fit360=False):
     return res
 #
 
-def lat_to_text(lat):
+def lon_to_text(lon):
     """return the text represetation of the location"""
     
     signs = ['Ari', 'Tau', 'Gem', 'Can',
@@ -60,10 +60,10 @@ def lat_to_text(lat):
              'Sag', 'Cap', 'Aqu', 'Pis'
             ]
 
-    unifiedLat = _fit360(lat)
+    unifiedLon = _fit360(lon)
 
-    signum    = int(unifiedLat // 30)
-    deg_float = unifiedLat % 30
+    signum    = int(unifiedLon // 30)
+    deg_float = unifiedLon % 30
     
     minutef, deg = math.modf(deg_float)
     
@@ -74,7 +74,14 @@ def lat_to_text(lat):
     return string
 
 #
-def location_diff(planet1, planet2, start, end, freq="1D", scale=1):
+
+def _fit180(n):
+    if abs(n) >= 180:
+        return 360 - abs(n)
+    else: 
+        return abs(n)
+
+def location_diff(planet1, planet2, start, end, freq="1D", scale=1, fit180=False):
     """Calculate the difference of location between 2 planets in given time span"""
 
     loc_planet1 = loc_of_planet(planet1, start, end, freq, scale, fit360=True)
@@ -83,12 +90,34 @@ def location_diff(planet1, planet2, start, end, freq="1D", scale=1):
     #name1 = swe.get_planet_name(planet1)
     #name2 = swe.get_planet_name(planet2)
 
-    diff = abs(loc_planet1 - loc_planet2)
+    diff = loc_planet1 - loc_planet2
 
-    fit180 = lambda x: 360 - x if x >= 180 else x
+    if fit180:
+        return diff.apply(_fit180)
 
-    return diff.apply(fit180)
+    return diff
 
+#
+def aspect_list(planet1, planet2, start, end, aspect, scale=1):
+    """ return a list of aspect made by 2 planets in given time span and aspect
+        I only need the exact day so the calculation can be simplified
+    """
+
+    #TODO: rewrite this because the lambda seems too long..
+    if aspect in [0, 180]: 
+        diffs = location_diff(planet1, planet2, start, end, freq='3H', scale=scale)
+    else:
+        diffs = location_diff(planet1, planet2, start, end, freq='3H', scale=scale, fit180=True)
+
+    aspected = lambda x: True if (x[0]-aspect) * (x[1]-aspect) < 0 and x[1] > aspect - 10 and x[1] < aspect + 10 else False
+
+    aspectlist = pd.rolling_apply(diffs, 2, aspected)
+
+    tindex = aspectlist[aspectlist==True].index
+
+    res = pd.Series([aspect] * len(tindex), tindex)
+
+    return res
 
 
 
