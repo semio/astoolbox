@@ -76,12 +76,12 @@ def lon_to_text(lon):
 #
 
 def _fit180(n):
-    if abs(n) >= 180:
-        return 360 - abs(n)
+    if n >= 180:
+        return 360 - n
     else: 
-        return abs(n)
+        return n
 
-def location_diff(planet1, planet2, start, end, freq="1D", scale=1, fit180=False):
+def location_diff(planet1, planet2, start, end, freq="1D", scale=1):
     """Calculate the difference of location between 2 planets in given time span"""
 
     loc_planet1 = loc_of_planet(planet1, start, end, freq, scale, fit360=True)
@@ -90,12 +90,9 @@ def location_diff(planet1, planet2, start, end, freq="1D", scale=1, fit180=False
     #name1 = swe.get_planet_name(planet1)
     #name2 = swe.get_planet_name(planet2)
 
-    diff = loc_planet1 - loc_planet2
+    diff = abs(loc_planet1 - loc_planet2)
 
-    if fit180:
-        return diff.apply(_fit180)
-
-    return diff
+    return diff.apply(_fit180)
 
 #
 
