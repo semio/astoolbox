@@ -8,8 +8,12 @@ import math
 def _fit360(n):
     while n >= 360:
         n = n - 360
-
-    return n
+    
+    if n >= 0:
+        return n
+    else:
+        n = n + 360
+        return n
 #
 
 def loc_of_planet(planet, start, end, freq='1D', scale=1, fit360=False):
@@ -76,12 +80,12 @@ def lon_to_text(lon):
 #
 
 def _fit180(n):
-    if n >= 180:
-        return 360 - n
+    if abs(n) >= 180:
+        return 360 - abs(n)
     else: 
-        return n
+        return abs(n)
 
-def location_diff(planet1, planet2, start, end, freq="1D", scale=1):
+def location_diff(planet1, planet2, start, end, freq="1D", scale=1, fit180=True):
     """Calculate the difference of location between 2 planets in given time span"""
 
     loc_planet1 = loc_of_planet(planet1, start, end, freq, scale, fit360=True)
@@ -90,9 +94,12 @@ def location_diff(planet1, planet2, start, end, freq="1D", scale=1):
     #name1 = swe.get_planet_name(planet1)
     #name2 = swe.get_planet_name(planet2)
 
-    diff = abs(loc_planet1 - loc_planet2)
+    diff = loc_planet1 - loc_planet2
 
-    return diff.apply(_fit180)
+    if fit180:
+        return diff.apply(_fit180)
+
+    return diff
 
 #
 
