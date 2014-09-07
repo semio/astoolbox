@@ -11,11 +11,12 @@ def _sign(x):
         return 1
     else: return -1
 
-def aspect_list(planet1, planet2, start, end, aspect, scale=1):
+def aspect_list(planet1, planet2, start, end, aspect, freq='3H', scale=1):
     """ return a list of aspect made by 2 planets in given time span and aspect
         I only need the exact day so the calculation can be simplified
+
+        modify freq to get different accurance 
     """
-    freq = '3H' # modify this to get different accurance 
 
     # we don't normalize the distance when calculating 0/180 degree.
     if aspect in [0, 180]: 
@@ -36,3 +37,16 @@ def aspect_list(planet1, planet2, start, end, aspect, scale=1):
     res = pd.Series([aspect] * len(tindex), tindex)
 
     return res
+
+def aspect_list2(planet1, planet2, start, end, aspl, freq='3H', scale=1):
+    """ Just another version of aspect_list but accept a list of aspects. """
+
+    res = []
+    for asp in aspl:
+        t = aspect_list(planet1, planet2, start, end, asp, freq, aspect=i)
+    
+        res.append(t)
+    
+
+    n = pd.concat(res)
+    return n.sort_index()
