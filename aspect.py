@@ -43,7 +43,7 @@ def aspect_list2(planet1, planet2, start, end, aspl, freq='3H', scale=1):
 
     res = []
     for asp in aspl:
-        t = aspect_list(planet1, planet2, start, end, asp, freq)
+        t = aspect_list(planet1, planet2, start, end, asp, freq, scale=scale)
     
         res.append(t)
     
