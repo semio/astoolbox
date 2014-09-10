@@ -63,6 +63,9 @@ def next_aspect(planet1, planet2, asps=None,
 
     if not start:
         start = datetime.today()
+    elif type(start) == 'str':
+        start = pd.to_datetime(start)
+
     if not asps:
         asps = [0, 60, 90, 120, 180]
     step = timedelta(days=30)
