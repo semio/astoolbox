@@ -63,7 +63,7 @@ def next_aspect(planet1, planet2, asps=None,
 
     if not start:
         start = datetime.today()
-    elif type(start) == 'str':
+    elif type(start) is str:
         start = pd.to_datetime(start)
 
     if not asps:
