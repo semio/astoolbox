@@ -6,20 +6,20 @@ import pandas as pd
 import numpy as np
 
 def load_from_xueqiu(stock, start=None, end=None):
-    """ load bars data from XueQiu """  
+    """ load bars data from XueQiu """
     import requests
     from StringIO import StringIO
     link = "http://xueqiu.com/S/%s/historical.csv" % stock
-    
+
     header = {
-        "User-Agent" : 
+        "User-Agent" :
         "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_10_2) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/40.0.2214.111 Safari/537.36"
     }
-    
+
     r = requests.get(link, headers=header)
-    
+
     df = pd.DataFrame.from_csv(StringIO(r.content), index_col=1, parse_dates=True)
-    
+
     if start:
         if end:
             return df[start:end]
@@ -39,19 +39,19 @@ def candlestick(ax, df, width=0.4, colorup='k', colordown='r',alpha=1.0):
     import matplotlib.ticker as mticker
 
     OFFSET = width / 2.0
-    
+
     low = df.low.values
     high = df.high.values
     op = df.open.values
     co = df.close.values
     t = df.index.to_pydatetime()
     tt = date2num(t)
-    
+
     lines = []
     rects = []
-    
+
     for i in range(len(tt)):
-        
+
         if co[i] >= op[i]:
             color = colorup
             lower = op[i]
@@ -60,16 +60,16 @@ def candlestick(ax, df, width=0.4, colorup='k', colordown='r',alpha=1.0):
             color = colordown
             lower = co[i]
             height = op[i] - co[i]
-        
+
         vline = Line2D(
-            xdata=(tt[i], tt[i]), 
+            xdata=(tt[i], tt[i]),
             ydata=(low[i], high[i]),
             color=color,
             linewidth=0.5,
             #antialiased=True,
         )
         vline.set_alpha(alpha)
-        
+
         rect = Rectangle(
             xy=(tt[i] - OFFSET, lower),
             width = width,
